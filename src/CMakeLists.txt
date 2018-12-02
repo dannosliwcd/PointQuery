@@ -1,5 +1,6 @@
 add_library(PointQuery STATIC
 	CountyRecord.cpp CountyRecord.h
+	PointFinder.cpp PointFinder.h
 	)
 target_include_directories(PointQuery PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
