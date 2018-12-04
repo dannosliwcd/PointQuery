@@ -18,10 +18,12 @@ public:
 	virtual ~PointFinder();
 	virtual std::vector<CountyRecord> FindNearest(
 			decltype(CountyRecord::m_latitude) lat,
-		       	decltype(CountyRecord::m_latitude) longitude,
-		       	unsigned int nearestCount) = 0;
+			decltype(CountyRecord::m_latitude) longitude,
+			unsigned int nearestCount) = 0;
 
-	static std::unique_ptr<PointFinder> Make(Method method);
+	static std::unique_ptr<PointFinder> Make(
+			Method method,
+			const std::vector<CountyRecord>& countyRecords);
 };
 
 #endif //POINTFINDER_H

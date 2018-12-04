@@ -1,4 +1,6 @@
 #include <PointFinder.h>
+#include <QuadTreePointFinder.h>
+#include <KDTreePointFinder.h>
 
 PointFinder::PointFinder()
 {
@@ -9,16 +11,16 @@ PointFinder::~PointFinder()
 }
 
 std::unique_ptr<PointFinder>
-PointFinder::Make(Method method)
+PointFinder::Make(Method method, const std::vector<CountyRecord>& countyRecords)
 {
 	switch (method)
 	{
 		case Method::KDTree:
-			throw std::runtime_error("K-D Tree method not yet implemented");
+			return std::unique_ptr<PointFinder>(new KDTreePointFinder(countyRecords));
 		case Method::QuadTree:
-			throw std::runtime_error("Quadtree method not yet implemented");
+			return std::unique_ptr<PointFinder>(new QuadTreePointFinder(countyRecords));
 		case Method::Linear:
-			throw std::runtime_error("Linear method not yet implemented");
+			throw std::runtime_error("Linear search method not yet implemented");
 	}
-	return nullptr;
+	throw std::runtime_error("Unknown search method specified");
 }

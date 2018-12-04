@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 		exit(1);
 	}
 
-	auto pointFinder = PointFinder::Make(method);
+	auto pointFinder = PointFinder::Make(method, records);
 	for (const auto& query : queries)
 	{
 		auto delimeterIndex = query.find(":");
