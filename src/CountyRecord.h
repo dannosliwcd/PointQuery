@@ -2,6 +2,7 @@
 #define COUNTYRECORD_H
 
 #include <string>
+#include <iosfwd>
 
 struct CountyRecord
 {

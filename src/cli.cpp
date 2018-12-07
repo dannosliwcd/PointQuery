@@ -2,8 +2,14 @@
 #include <PointFinder.h>
 #include <CLI11.hpp>
 #include <iostream>
-#include <fstream>
+#include <vector>
+#include <string>
 #include <cstring>
+#include <stdexcept>
+#include <memory>
+#include <limits>
+#include <stdlib.h>
+#include <errno.h>
 
 int main(int argc, char** argv)
 {
