@@ -14,5 +14,8 @@ struct CountyRecord
 	static bool IsValidHeader(const std::string& countyRecordString);
 };
 
+bool operator==(const CountyRecord& lhs, const CountyRecord& rhs);
+bool operator!=(const CountyRecord& lhs, const CountyRecord& rhs);
+std::ostream& operator<<(std::ostream& os, const CountyRecord& record);
 
 #endif //COUNTYRECORD_H

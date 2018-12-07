@@ -1,6 +1,6 @@
-#include <PointFinder.h>
-#include <QuadTreePointFinder.h>
-#include <KDTreePointFinder.h>
+#include "PointFinder.h"
+#include "QuadTreePointFinder.h"
+#include "KDTreePointFinder.h"
 
 PointFinder::PointFinder()
 {

@@ -1,6 +1,6 @@
 #ifndef POINTFINDER_H
 #define POINTFINDER_H
-#include <CountyRecord.h>
+#include "CountyRecord.h"
 #include <memory>
 #include <vector>
 
