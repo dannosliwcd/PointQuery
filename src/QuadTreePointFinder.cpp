@@ -1,3 +1,4 @@
+#include "CountyRecord.h"
 #include <QuadTreePointFinder.h>
 
 QuadTreePointFinder::QuadTreePointFinder(

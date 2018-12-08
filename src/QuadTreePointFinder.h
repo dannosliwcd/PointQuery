@@ -2,7 +2,6 @@
 #define QUADTREEPOINTFINDER_H
 #include <CountyRecord.h>
 #include <PointFinder.h>
-#include <memory>
 #include <vector>
 
 class QuadTreePointFinder final : public PointFinder

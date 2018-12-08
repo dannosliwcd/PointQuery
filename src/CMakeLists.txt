@@ -3,6 +3,7 @@ add_library(PointQuery STATIC
 	PointFinder.cpp PointFinder.h
 	KDTreePointFinder.cpp KDTreePointFinder.h
 	QuadTreePointFinder.cpp QuadTreePointFinder.h
+	MaxHeap.h
 	)
 target_include_directories(PointQuery PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
