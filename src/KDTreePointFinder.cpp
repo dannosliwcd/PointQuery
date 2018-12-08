@@ -94,7 +94,7 @@ std::vector<CountyRecord> KDTreePointFinder::FindNearest(
 
 	// tuple<do_left_prune_check, parent_axis_split, current_node>
 	std::vector<std::tuple<bool, float, KDNode*> > nextNodeStack {
-		std::make_tuple(true, std::numeric_limits<float>::max(), m_root.get())
+		std::make_tuple(true, 1e3, m_root.get())
 	}; // TODO: verify: max stack height is lg(n)?
 	
 	while (!nextNodeStack.empty())
