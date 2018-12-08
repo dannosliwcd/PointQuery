@@ -96,14 +96,22 @@ TEST_CASE("surrounding a central point")
 		}
 	}
 
-	//SECTION("in between")
-	//{
-	//	auto nearest = finder->FindNearest(1, 1, 1);
-	//	REQUIRE(nearest.size() == 1);
-	//	REQUIRE(records[8] == nearest.front());
+	SECTION("in between")
+	{
+		auto nearest = finder->FindNearest(1, 1, 1);
+		REQUIRE(nearest.size() == 1);
+		REQUIRE(records[8] == nearest.front());
 
-	//	nearest = finder->FindNearest(8, 8, 1);
-	//	REQUIRE(nearest.size() == 1);
-	//	REQUIRE(records[0] == nearest.front());
-	//}
+		nearest = finder->FindNearest(8, 8, 1);
+		REQUIRE(nearest.size() == 1);
+		REQUIRE(records[0] == nearest.front());
+	}
+
+	SECTION("2 nearest")
+	{
+		auto nearest = finder->FindNearest(7, 9, 2);
+		REQUIRE(nearest.size() == 2);
+		CHECK(records[4] == nearest[0]);
+		REQUIRE(records[0] == nearest[1]);
+	}
 }

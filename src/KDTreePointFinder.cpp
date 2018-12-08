@@ -1,11 +1,11 @@
 #include "KDTreePointFinder.h"
 #include "CountyRecord.h"
+#include "MaxHeap.h"
 #include <algorithm>
 #include <memory>
 #include <tuple>
 #define _USE_MATH_DEFINES
 #include <cmath>
-#include <limits>
 #include <utility>
 
 struct KDNode final
@@ -86,11 +86,9 @@ std::vector<CountyRecord> KDTreePointFinder::FindNearest(
 		decltype(CountyRecord::m_latitude) longitude,
 		unsigned int nearestCount)
 {
-	std::vector<CountyRecord> records;
-
-	// TODO: Track k nearest on a heap of records keyed by distance
-	CountyRecord* nearest = nullptr;
-	auto bestDistance = std::numeric_limits<float>::infinity();
+	// Keep the best distances in a max heap. The worst of the best are the
+	// first to remove, so we will eventually have it full with only the best.
+	MaxHeap<float, CountyRecord*> nearestCounties(nearestCount);
 
 	// tuple<do_left_prune_check, parent_axis_split, current_node>
 	std::vector<std::tuple<bool, float, KDNode*> > nextNodeStack {
@@ -123,50 +121,56 @@ std::vector<CountyRecord> KDTreePointFinder::FindNearest(
 		// with an equirectangular projection. Distance measurements
 		// are impacted by your choice of central point for the
 		// projection.
-		if (doLeftCheck)
+		if (!nearestCounties.IsEmpty())
 		{
-			if (node->m_isLongitude)
+			if (doLeftCheck)
 			{
-				auto distance = Distance(latitude, parentSplit, longitude, longitude);
-				if (distance > bestDistance && latitude < parentSplit)
+				if (node->m_isLongitude)
 				{
-					continue;
+					auto distance = Distance(latitude, parentSplit, longitude, longitude);
+					if (distance > nearestCounties.GetMax().p && latitude < parentSplit)
+					{
+						continue;
+					}
+				}
+				else
+				{
+					auto distance = Distance(latitude, latitude, longitude, parentSplit);
+					if (distance > nearestCounties.GetMax().p && longitude < parentSplit)
+					{
+						continue;
+					}
 				}
 			}
 			else
 			{
-				auto distance = Distance(latitude, latitude, longitude, parentSplit);
-				if (distance > bestDistance && longitude < parentSplit)
+				if (node->m_isLongitude)
 				{
-					continue;
+					auto distance = Distance(latitude, parentSplit, longitude, longitude);
+					if (distance > nearestCounties.GetMax().p && latitude > parentSplit)
+					{
+						continue;
+					}
 				}
-			}
-		}
-		else
-		{
-			if (node->m_isLongitude)
-			{
-				auto distance = Distance(latitude, parentSplit, longitude, longitude);
-				if (distance > bestDistance && latitude > parentSplit)
+				else
 				{
-					continue;
-				}
-			}
-			else
-			{
-				auto distance = Distance(latitude, latitude, longitude, parentSplit);
-				if (distance > bestDistance && longitude > parentSplit)
-				{
-					continue;
+					auto distance = Distance(latitude, latitude, longitude, parentSplit);
+					if (distance > nearestCounties.GetMax().p && longitude > parentSplit)
+					{
+						continue;
+					}
 				}
 			}
 		}
 
 		auto distance = Distance(latitude, longitude, node->m_record.m_latitude, node->m_record.m_longitude);
-		if (distance < bestDistance)
+		if (nearestCounties.IsEmpty() || distance < nearestCounties.GetMax().p)
 		{
-			bestDistance = distance;
-			nearest = &node->m_record;
+			if (nearestCounties.IsFull())
+		       	{
+				nearestCounties.RemoveMax();
+			}
+			nearestCounties.Insert(distance, &node->m_record);
 		}
 
 		// Go first to branches we think are more likely to improve our
@@ -190,9 +194,12 @@ std::vector<CountyRecord> KDTreePointFinder::FindNearest(
 		}
 	}
 
-	if (nearest)
+	std::vector<CountyRecord> records;
+	records.reserve(nearestCounties.GetSize());
+	while (!nearestCounties.IsEmpty())
 	{
-		records.emplace_back(*nearest);
+		records.emplace_back(*nearestCounties.GetMax().e);
+		nearestCounties.RemoveMax();
 	}
 	return records;
 }

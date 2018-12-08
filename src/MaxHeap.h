@@ -81,6 +81,12 @@ public:
 		return (m_heapSize == m_maxHeapSize);
 	}
 
+	// Return the count of elements in the heap
+	size_t GetSize() const
+	{
+		return m_heapSize;
+	}
+
 private:
 	// Move a heap entry closer to the root, if possible
 	void UpHeap(int fromIndex)

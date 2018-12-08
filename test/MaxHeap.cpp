@@ -25,15 +25,19 @@ TEST_CASE("single entry heap")
 TEST_CASE("heap order")
 {
 	MaxHeap<int, std::string> heap(5);
+	REQUIRE(heap.GetSize() == 0);
 	heap.Insert(5, "Five");
+	REQUIRE(heap.GetSize() == 1);
 	heap.Insert(3, "Three");
 	heap.Insert(8, "Eight");
 	heap.Insert(30, "Thirty");
 	heap.Insert(1, "One");
 	REQUIRE(heap.IsFull());
+	REQUIRE(heap.GetSize() == 5);
 
 	REQUIRE(heap.GetMax().e == "Thirty");
 	heap.RemoveMax();
+	REQUIRE(heap.GetSize() == 4);
 	REQUIRE(heap.GetMax().e == "Eight");
 	heap.RemoveMax();
 	REQUIRE(heap.GetMax().e == "Five");
