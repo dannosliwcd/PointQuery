@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <exception>
+#include <chrono>
 
 int main(int argc, char** argv)
 {
@@ -87,7 +88,10 @@ int main(int argc, char** argv)
 		exit(1);
 	}
 
+	auto buildStart = std::chrono::steady_clock::now();
 	auto pointFinder = PointFinder::Make(method, records);
+	auto buildEnd = std::chrono::steady_clock::now();
+	auto buildElapsed = std::chrono::duration<float>(buildEnd - buildStart);
 	for (const auto& query : queries)
 	{
 		auto delimeterIndex = query.find(":");
@@ -106,10 +110,13 @@ int main(int argc, char** argv)
 				"Expected: latitude_float:longitude_float." << std::endl;
 		}
 
+		auto knnStart = std::chrono::steady_clock::now();
 		auto nearestPoints = pointFinder->FindNearest(
 				latitude,
 			       	longitude < 0 ? longitude + 360.0f : longitude,
 			       	pointCount);
+		auto knnEnd = std::chrono::steady_clock::now();
+		auto knnElapsed = std::chrono::duration<float>(knnEnd - knnStart);
 
 		std::cout << "Nearest " << pointCount << " points to ("
 			<< latitude << ", " << longitude << "):\n";
@@ -118,6 +125,9 @@ int main(int argc, char** argv)
 			std::cout << point.m_county << ", " << point.m_state << " (" 
 				<< point.m_latitude << ", " << (point.m_longitude > 180 ? point.m_longitude - 360.0f : point.m_longitude) << ")\n";
 		}
+
+		std::cout << "Time to build the index: " << buildElapsed.count()
+			<< " s\nTime to calculate nearest neighbors: " << knnElapsed.count() << " s" << std::endl;
 		std::cout << std::flush;
 	}
 

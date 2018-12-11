@@ -113,6 +113,9 @@ std::vector<CountyRecord> KDTreePointFinder::FindNearest(
 		// Skip this node and children if the node parent's split is so far from
 		// the query that the node cannot possibly contain a better point.
 		//
+		// Note that we only want to prune once the knn heap is full. Any point is
+		// a candidate if it can be added to the heap.
+		//
 		// TODO: Right now this necessarily performs a distance calculation. The
 		// prune can still help because children of this node will not be calculated,
 		// but see if there's a way to do any precalculation that can make this a
@@ -122,7 +125,7 @@ std::vector<CountyRecord> KDTreePointFinder::FindNearest(
 		// with an equirectangular projection. Distance measurements
 		// are impacted by your choice of central point for the
 		// projection.
-		if (!nearestCounties.IsEmpty())
+		if (!nearestCounties.IsEmpty() && nearestCounties.IsFull())
 		{
 			if (doLeftCheck)
 			{
