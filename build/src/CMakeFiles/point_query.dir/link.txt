@@ -1,0 +1,1 @@
+/usr/bin/c++.exe    -Wl,--enable-auto-import CMakeFiles/point_query.dir/cli.cpp.o  -o point_query.exe -Wl,--out-implib,libpoint_query.dll.a -Wl,--major-image-version,0,--minor-image-version,0 libPointQuery.a 

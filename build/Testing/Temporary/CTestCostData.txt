@@ -1,0 +1,8 @@
+read a record 0 0
+fail to read an incomplete record 0 0
+verify a good header 0 0
+fail to verify an incomplete header 1 0.073765
+---
+read a record
+fail to read an incomplete record
+verify a good header

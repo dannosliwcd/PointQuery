@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/cygdrive/c/Users/Brian/Desktop/EC504/PointQuery/src/CountyRecord.cpp
+CountyRecord.h
+/cygdrive/c/Users/Brian/Desktop/EC504/PointQuery/src/CountyRecord.h
+
+/cygdrive/c/Users/Brian/Desktop/EC504/PointQuery/src/CountyRecord.h
+string
+-
+

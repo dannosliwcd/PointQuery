@@ -1,0 +1,38 @@
+Performing C++ SOURCE FILE Test ASAN_SUPPORTED failed with the following output:
+Change Dir: /cygdrive/c/Users/Brian/Desktop/EC504/PointQuery/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make.exe" "cmTC_d5f0f/fast"
+/usr/bin/make -f CMakeFiles/cmTC_d5f0f.dir/build.make CMakeFiles/cmTC_d5f0f.dir/build
+make[1]: Entering directory '/cygdrive/c/Users/Brian/Desktop/EC504/PointQuery/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_d5f0f.dir/src.cxx.o
+/usr/bin/c++.exe     -DASAN_SUPPORTED -fsanitize=address   -fsanitize=address -o CMakeFiles/cmTC_d5f0f.dir/src.cxx.o -c /cygdrive/c/Users/Brian/Desktop/EC504/PointQuery/build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_d5f0f.exe
+/usr/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_d5f0f.dir/link.txt --verbose=1
+/usr/bin/c++.exe   -DASAN_SUPPORTED -fsanitize=address  -Wl,--enable-auto-import  CMakeFiles/cmTC_d5f0f.dir/src.cxx.o  -o cmTC_d5f0f.exe -Wl,--out-implib,libcmTC_d5f0f.dll.a -Wl,--major-image-version,0,--minor-image-version,0 
+/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../x86_64-pc-cygwin/bin/ld: cannot find -lasan
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_d5f0f.dir/build.make:98: cmTC_d5f0f.exe] Error 1
+make[1]: Leaving directory '/cygdrive/c/Users/Brian/Desktop/EC504/PointQuery/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:126: cmTC_d5f0f/fast] Error 2
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test UBSAN_SUPPORTED failed with the following output:
+Change Dir: /cygdrive/c/Users/Brian/Desktop/EC504/PointQuery/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make.exe" "cmTC_bca9a/fast"
+/usr/bin/make -f CMakeFiles/cmTC_bca9a.dir/build.make CMakeFiles/cmTC_bca9a.dir/build
+make[1]: Entering directory '/cygdrive/c/Users/Brian/Desktop/EC504/PointQuery/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_bca9a.dir/src.cxx.o
+/usr/bin/c++.exe     -DUBSAN_SUPPORTED -fsanitize=undefined   -fsanitize=undefined -o CMakeFiles/cmTC_bca9a.dir/src.cxx.o -c /cygdrive/c/Users/Brian/Desktop/EC504/PointQuery/build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_bca9a.exe
+/usr/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_bca9a.dir/link.txt --verbose=1
+/usr/bin/c++.exe   -DUBSAN_SUPPORTED -fsanitize=undefined  -Wl,--enable-auto-import  CMakeFiles/cmTC_bca9a.dir/src.cxx.o  -o cmTC_bca9a.exe -Wl,--out-implib,libcmTC_bca9a.dll.a -Wl,--major-image-version,0,--minor-image-version,0 
+/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../x86_64-pc-cygwin/bin/ld: cannot find -lubsan
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_bca9a.dir/build.make:98: cmTC_bca9a.exe] Error 1
+make[1]: Leaving directory '/cygdrive/c/Users/Brian/Desktop/EC504/PointQuery/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:126: cmTC_bca9a/fast] Error 2
+
+Source file was:
+int main() { return 0; }
