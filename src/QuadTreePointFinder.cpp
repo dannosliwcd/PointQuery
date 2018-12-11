@@ -1,84 +1,19 @@
 #include "CountyRecord.h"
 #include <QuadTreePointFinder.h>
-
-QuadTreePointFinder::QuadTreePointFinder(
-		const std::vector<CountyRecord>& countyRecords)
-{
-	// TODO: countyRecords contains the raw list of county records.
-	//       Insert those records into your internal data structure for
-	//       the quad tree. You'll probably want to create a new member
-	//       variable for QuadTreePointFinder in the header file and add
-	//       the values there.
-	//
-	//       Don't worry about timing everything the CLI can handle that.
-	//       We can write the timer code once in the CLI and it will be applied
-	//       to all algorithms we use, instead of rewriting it for each algorithm.
-}
-
-QuadTreePointFinder::~QuadTreePointFinder()
-{
-}
-
-std::vector<CountyRecord> QuadTreePointFinder::FindNearest(
-		decltype(CountyRecord::m_latitude) lat,
-		decltype(CountyRecord::m_latitude) longitude,
-		unsigned int nearestCount)
-{
-	// TODO: Return the actual nearest points instead of an empty vector.
-	//       Base your search on the member variable you created for the other TODO
-	return {};
-}
-
-// C++ Implementation of Quad Tree 
+#include "Maxheap.h"
 #include <iostream> 
 #include <cmath> 
 #include <string.h>
 #include<vector>
-#include "Maxheap.h"
 using namespace std;
+using Node = QuadTreePointFinder::Node;
+using Point = QuadTreePointFinder::Point;
 
 //shoudl these be static?
 static int NE = 1;
 static int NW = 2;
 static int SE = 3;
 static int SW = 4;
-
-// Point dat struct
-struct Point 
-{ 
-	float x; 
-	float y; 
-	//constructors
-	Point(float _x, float _y) 
-	{ 
-		x = _x; //longitude
-		y = _y;  // latitude
-	} 
-	Point() 
-	{ 
-		x = 0; 
-		y = 0; 
-	} 
-}; 
-
-// The objects that we want stored in the quadtree 
-struct Node 
-{ 
-	Point pos; 
-	string state;
-	string county;
-	bool visited;
-	int quadrant;
-	Node(Point _pos, string _state, string _county) 
-	{ 
-		pos = _pos; 
-		state = _state;
-		county = _county;
-		visited = false;
-		quadrant = 0;
-		visited = false;
-	} 
-}; 
 
 // The main quadtree class 
 class Quad 
@@ -122,7 +57,7 @@ public:
 	void insert(Node*); 
 	Node* search(Point); 
 	bool inBoundary(Point); 
-	vector<Node> knn(int k, Quad quad, float longi, float lati, MaxHeap<float, Point> heap);
+	vector<Node> knn(int k, Quad& quad, float longi, float lati, MaxHeap<float, Point>& heap);
 }; 
 
 // Insert a node into the quadtree 
@@ -268,7 +203,7 @@ float findDistance(float long1,float lat1,float long2,float lat2){
 	return (sqrt(x*x + y*y)*6371);
 }
 
- vector<Node> Quad::knn(int k, Quad quad, float longi, float lati, MaxHeap<float, Point> heap){
+ vector<Node> Quad::knn(int k, Quad& quad, float longi, float lati, MaxHeap<float, Point>& heap){
 
  	for(int i = 0; i < k; i++){
  		// heap.insert(quad.search(Point(longi, lati)));	
@@ -279,5 +214,47 @@ float findDistance(float long1,float lat1,float long2,float lat2){
  	//if SW, check se, nw, ne
  	//if SE, check sw, ne, nw
  	//now, check all quadrants
+	return {};
+}
+
+QuadTreePointFinder::QuadTreePointFinder(
+		const std::vector<CountyRecord>& countyRecords)
+	: m_quad(new Quad()), m_nodes()
+{
+	m_nodes.reserve(countyRecords.size());
+	for (const auto& record : countyRecords)
+	{
+		// TODO: insert nodes in the tree for each record.
+		m_nodes.emplace_back(Point(record.m_longitude, record.m_latitude), record.m_state, record.m_county);
+		m_quad->insert(&m_nodes.back());
+	}
+
+
+}
+
+QuadTreePointFinder::~QuadTreePointFinder()
+{
+}
+
+std::vector<CountyRecord> QuadTreePointFinder::FindNearest(
+		decltype(CountyRecord::m_latitude) latitude,
+		decltype(CountyRecord::m_latitude) longitude,
+		unsigned int nearestCount)
+{
+	MaxHeap<float, Point> heap(nearestCount);
+	m_quad->knn(nearestCount, *m_quad, longitude, latitude, heap);
+
+	//PRINT HEAP
+
+	/*cout << "Node a: " << 
+		center.search(Point(1, 1))->data << "\n"; 
+	cout << "Node b: " << 
+		center.search(Point(2, 5))->data << "\n"; 
+	cout << "Node c: " << 
+		center.search(Point(7, 6))->data << "\n"; 
+	cout << "Non-existing node: "
+		<< center.search(Point(5, 5)); */
+
+	// TODO: Return the actual nearest points instead of an empty vector.
 	return {};
 }
