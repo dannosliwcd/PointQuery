@@ -10,6 +10,7 @@
 #include <limits>
 #include <stdlib.h>
 #include <errno.h>
+#include <exception>
 
 int main(int argc, char** argv)
 {
@@ -41,9 +42,13 @@ int main(int argc, char** argv)
 	std::string line;
 	if (std::getline(countyFile, line))
 	{
-		if (!CountyRecord::IsValidHeader(line))
+		try
 		{
-			std::cerr << "Invalid header in " << filePath << std::endl;
+			CountyRecord::CheckValidHeader(line);
+		}
+		catch (const std::exception& e)
+		{
+			std::cerr << "Bad Header: " << e.what() << std::endl;
 			exit(1);
 		}
 	}
@@ -57,6 +62,10 @@ int main(int argc, char** argv)
 	while (std::getline(countyFile, line))
 	{
 		records.emplace_back(CountyRecord::FromString(line));
+		if (records.back().m_longitude < 0)
+		{
+			records.back().m_longitude += 360.0f;
+		}
 	}
 
 	PointFinder::Method method;
@@ -97,14 +106,17 @@ int main(int argc, char** argv)
 				"Expected: latitude_float:longitude_float." << std::endl;
 		}
 
-		auto nearestPoints = pointFinder->FindNearest(latitude, longitude, pointCount);
+		auto nearestPoints = pointFinder->FindNearest(
+				latitude,
+			       	longitude < 0 ? longitude + 360.0f : longitude,
+			       	pointCount);
 
 		std::cout << "Nearest " << pointCount << " points to ("
 			<< latitude << ", " << longitude << "):\n";
 		for (const auto& point : nearestPoints)
 		{
 			std::cout << point.m_county << ", " << point.m_state << " (" 
-				<< point.m_latitude << ", " << point.m_longitude << ")\n";
+				<< point.m_latitude << ", " << (point.m_longitude > 180 ? point.m_longitude - 360.0f : point.m_longitude) << ")\n";
 		}
 		std::cout << std::flush;
 	}

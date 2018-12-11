@@ -19,10 +19,10 @@ TEST_CASE("fail to read an incomplete record")
 
 TEST_CASE("verify a good header")
 {
-	REQUIRE(CountyRecord::IsValidHeader("STATE_ALPHA	COUNTY_NAME	PRIM_LAT_DEC	PRIM_LONG_DEC\n"));
+	CountyRecord::CheckValidHeader("STATE_ALPHA	COUNTY_NAME	PRIM_LAT_DEC	PRIM_LONG_DEC\n");
 }
 
 TEST_CASE("fail to verify an incomplete header")
 {
-	REQUIRE_FALSE(CountyRecord::IsValidHeader("STATE_ALPHA	COUNTY_NAME"));
+	REQUIRE_THROWS(CountyRecord::CheckValidHeader("STATE_ALPHA	COUNTY_NAME"));
 }

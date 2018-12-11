@@ -1,20 +1,57 @@
 #include "CountyRecord.h"
 #include <iostream>
+#include <sstream>
+#include <stdexcept>
 
-bool CountyRecord::IsValidHeader(const std::string& countyRecordString)
+void CountyRecord::CheckValidHeader(const std::string& countyRecordString)
 {
-	// TODO: return whether the given line is a valid header
 	// Example: STATE_ALPHA 	COUNTY_NAME P	RIM_LAT_DEC 	PRIM_LONG_DEC
-	return false;
+	std::istringstream iss(countyRecordString);
+	std::string column;
+	iss >> column;
+	if (column != "STATE_ALPHA")
+	{
+		throw std::runtime_error("Bad column: " + column);
+	}
+	iss >> column;
+	if (column != "COUNTY_NAME")
+	{
+		throw std::runtime_error("Bad column: " + column);
+	}
+	iss >> column;
+	if (column != "PRIM_LAT_DEC")
+	{
+		throw std::runtime_error("Bad column: " + column);
+	}
+	iss >> column;
+	if (column != "PRIM_LONG_DEC")
+	{
+		throw std::runtime_error("Bad column: " + column);
+	}
+	iss >> column;
+	if (!iss.eof())
+	{
+		throw std::runtime_error("Too many columns");
+	}
 }
 
 CountyRecord CountyRecord::FromString(const std::string& countyRecordString)
 {
-	// TODO: Throw if invalid format
-	// TODO: Throw if nothing remaining to read
-	// TODO: Read a line of values into a CountyRecord and return it
 	// Example: AR 			Benton 			36.4805825 	-94.4580681
-	return {};
+	std::istringstream iss(countyRecordString);
+	std::string state;
+	std::string county;
+	float latitude;
+	float longitude;
+
+	std::getline(iss, state, '\t');
+	std::getline(iss, county, '\t');
+	iss >> latitude >> longitude;
+	if (iss.fail())
+	{
+		throw std::runtime_error("Bad record: " + countyRecordString);
+	}
+	return {state, county, latitude, longitude};
 }
 
 bool operator==(const CountyRecord& lhs, const CountyRecord& rhs)
