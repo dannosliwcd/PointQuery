@@ -8,6 +8,8 @@
 #include <cmath>
 #include <utility>
 
+#include <iostream>
+
 struct KDNode final
 {
 	std::unique_ptr<KDNode> m_left;
@@ -36,7 +38,6 @@ std::unique_ptr<KDNode> KDTreePointFinder::BuildTree(
 			});
 	auto midpoint = records.size() / 2; 
 	auto medianRecord = records[midpoint];
-	auto median = useLongitude ? medianRecord.m_longitude : medianRecord.m_latitude;
 
 	// Split into (left, <remove the split point>, right)
 	auto left = BuildTree(std::vector<CountyRecord>(records.begin(), records.begin() + midpoint), !useLongitude);

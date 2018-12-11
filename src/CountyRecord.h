@@ -12,7 +12,7 @@ struct CountyRecord
 	float m_longitude;
 
 	static CountyRecord FromString(const std::string& countyRecordString);
-	static bool IsValidHeader(const std::string& countyRecordString);
+	static void CheckValidHeader(const std::string& countyRecordString);
 };
 
 bool operator==(const CountyRecord& lhs, const CountyRecord& rhs);

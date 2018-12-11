@@ -15,7 +15,7 @@ public:
 	KDTreePointFinder(const std::vector<CountyRecord>& countyRecords);
 	virtual ~KDTreePointFinder();
 	virtual std::vector<CountyRecord> FindNearest(
-			decltype(CountyRecord::m_latitude) lat,
+			decltype(CountyRecord::m_latitude) latitude,
 			decltype(CountyRecord::m_latitude) longitude,
 			unsigned int nearestCount) override;
 
