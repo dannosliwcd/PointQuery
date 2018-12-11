@@ -28,6 +28,7 @@ std::vector<CountyRecord> QuadTreePointFinder::FindNearest(
 	//       Base your search on the member variable you created for the other TODO
 	return {};
 }
+
 // C++ Implementation of Quad Tree 
 #include <iostream> 
 #include <cmath> 
@@ -121,7 +122,7 @@ public:
 	void insert(Node*); 
 	Node* search(Point); 
 	bool inBoundary(Point); 
-	vector<Node> knn(int, Quad, float , float , Maxheap);
+	vector<Node> knn(int k, Quad quad, float longi, float lati, MaxHeap<float, Point> heap);
 }; 
 
 // Insert a node into the quadtree 
@@ -207,8 +208,10 @@ Node* Quad::search(Point p)
 	// We are at a quad of unit length 
 	// We cannot subdivide this quad further 
 	if (n != NULL) 
-		n.visited = true;
+	{
+		n->visited = true;
 		return n; 
+	}
 
 	if ((topLeft.x + botRight.x) / 2 >= p.x) 
 	{ 
@@ -265,10 +268,10 @@ float findDistance(float long1,float lat1,float long2,float lat2){
 	return (sqrt(x*x + y*y)*6371);
 }
 
- vector<Node> Quad::knn(int k, Quad quad, float longi, float lati, Maxheap heap){
+ vector<Node> Quad::knn(int k, Quad quad, float longi, float lati, MaxHeap<float, Point> heap){
 
  	for(int i = 0; i < k; i++){
- 		heap.insert(quad.search(Point(longi, lati)));	
+ 		// heap.insert(quad.search(Point(longi, lati)));	
  	}
  	//Node node = quad.search(Point(longi, lati));
  	//if NW, check ne, sw, se
@@ -276,33 +279,5 @@ float findDistance(float long1,float lat1,float long2,float lat2){
  	//if SW, check se, nw, ne
  	//if SE, check sw, ne, nw
  	//now, check all quadrants
- }
- }
-// Driver program 
-int main() 
-{ 
-	//Maxheap heap(3);
-	Quad center(Point(0, 0), Point(8, 8)); 
-	Node a(Point(1, 1),"aa","a"); 
-	Node b(Point(2, 5),"bb","b"); 
-	Node c(Point(7, 6), "cc","c"); 
-	center.insert(&a); 
-	center.insert(&b); 
-	center.insert(&c); 
-
-	center.knn(2, center, 93.33332, -33.22124, heap); 
-
-	//PRINT HEAP
-
-	/*cout << "Node a: " << 
-		center.search(Point(1, 1))->data << "\n"; 
-	cout << "Node b: " << 
-		center.search(Point(2, 5))->data << "\n"; 
-	cout << "Node c: " << 
-		center.search(Point(7, 6))->data << "\n"; 
-	cout << "Non-existing node: "
-		<< center.search(Point(5, 5)); */
-
-
-	return 0; 
-} 
+	return {};
+}
