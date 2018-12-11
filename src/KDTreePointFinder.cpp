@@ -1,12 +1,13 @@
 #include "KDTreePointFinder.h"
 #include "CountyRecord.h"
 #include "MaxHeap.h"
-#include <algorithm>
 #include <memory>
 #include <tuple>
-#define _USE_MATH_DEFINES
 #include <cmath>
 #include <utility>
+
+// Availability of M_PI is unpredictiable. Just define pi here.
+#define KD_PI 3.14159265358979323846
 
 #include <iostream>
 
@@ -17,6 +18,59 @@ struct KDNode final
 	bool m_isLongitude; // For more than 2 dimensions, make this an int and run levels modulo to this
 	CountyRecord m_record;
 };
+
+template<typename Comparison>
+static size_t Partition(std::vector<CountyRecord>& records, size_t left, size_t right, size_t pivot, Comparison compare)
+{
+	auto pivotRecord = records[pivot];
+	std::swap(records[pivot], records[right]);
+	auto partitionIndex = left;
+	for (auto i = left; i < right; ++i)
+	{
+		if (compare(records[i], pivotRecord))
+		{
+			std::swap(records[partitionIndex], records[i]);
+			++partitionIndex;
+		}
+	}
+
+	std::swap(records[right], records[partitionIndex]);
+	return partitionIndex;
+}
+
+// Get the kth record, partially sorting the collection of records as we go.
+template<typename Comparison>
+static void QuickSelect(std::vector<CountyRecord>& records, size_t left, size_t right, size_t k, Comparison compare)
+{
+	while(true)
+	{
+		if (left == right)
+		{
+			return;
+		}
+		auto pivot = left + (rand() % (right - left + 1));
+		pivot = Partition(records, left, right, pivot, compare);
+		if (k == pivot)
+		{
+			return;
+		}
+		else if (k < pivot)
+		{
+			right = pivot - 1;
+		}
+		else
+		{
+			left = pivot + 1;
+		}
+	}
+}
+
+template<typename Comparison>
+static void sortToMedian(std::vector<CountyRecord>& records, Comparison compare)
+{
+	//std::sort(records.begin(), records.end(), compare);
+	QuickSelect(records, 0, records.size() - 1, records.size() / 2, compare);
+}
 
 // Insert the records to the KD tree in a manner that should lead to a
 // more balanced tree.
@@ -30,7 +84,7 @@ std::unique_ptr<KDNode> KDTreePointFinder::BuildTree(
 		return nullptr;
 	}
 
-	std::sort(records.begin(), records.end(), [useLongitude](const CountyRecord& lhs, const CountyRecord& rhs)
+	sortToMedian(records, [useLongitude](const CountyRecord& lhs, const CountyRecord& rhs)
 			{
 				return useLongitude
 					? lhs.m_longitude < rhs.m_longitude
@@ -67,10 +121,10 @@ KDTreePointFinder::~KDTreePointFinder()
 static float Distance(float latitude1, float longitude1, float latitude2, float longitude2)
 {
 	// TODO: Can store lambda and phi instead of lat and long
-	auto lambda1 = longitude1 * M_PI / 180;
-	auto lambda2 = longitude2 * M_PI / 180;
-	auto phi1 = latitude1 * M_PI / 180;
-	auto phi2 = latitude2 * M_PI / 180;
+	auto lambda1 = longitude1 * KD_PI / 180;
+	auto lambda2 = longitude2 * KD_PI / 180;
+	auto phi1 = latitude1 * KD_PI / 180;
+	auto phi2 = latitude2 * KD_PI / 180;
 	static const auto EARTH_RADIUS_METERS = 6371e3;
 	
 	auto x = (lambda2 - lambda1) * std::cos((phi1 + phi2) / 2);
@@ -113,6 +167,9 @@ std::vector<CountyRecord> KDTreePointFinder::FindNearest(
 		// Skip this node and children if the node parent's split is so far from
 		// the query that the node cannot possibly contain a better point.
 		//
+		// Note that we only want to prune once the knn heap is full. Any point is
+		// a candidate if it can be added to the heap.
+		//
 		// TODO: Right now this necessarily performs a distance calculation. The
 		// prune can still help because children of this node will not be calculated,
 		// but see if there's a way to do any precalculation that can make this a
@@ -122,7 +179,7 @@ std::vector<CountyRecord> KDTreePointFinder::FindNearest(
 		// with an equirectangular projection. Distance measurements
 		// are impacted by your choice of central point for the
 		// projection.
-		if (!nearestCounties.IsEmpty())
+		if (!nearestCounties.IsEmpty() && nearestCounties.IsFull())
 		{
 			if (doLeftCheck)
 			{
