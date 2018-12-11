@@ -9,7 +9,7 @@ class PointFinder
 public:
 	enum class Method
 	{
-		Linear,
+		Heap,
 		QuadTree,
 		KDTree
 	};

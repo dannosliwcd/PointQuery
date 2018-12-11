@@ -2,6 +2,7 @@ add_library(PointQuery STATIC
 	CountyRecord.cpp CountyRecord.h
 	PointFinder.cpp PointFinder.h
 	KDTreePointFinder.cpp KDTreePointFinder.h
+	HeapPointFinder.cpp HeapPointFinder.h
 	QuadTreePointFinder.cpp QuadTreePointFinder.h
 	MaxHeap.h
 	)

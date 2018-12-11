@@ -1,6 +1,7 @@
 #include "PointFinder.h"
 #include "QuadTreePointFinder.h"
 #include "KDTreePointFinder.h"
+#include "HeapPointFinder.h"
 #include <stdexcept>
 
 PointFinder::PointFinder()
@@ -20,8 +21,8 @@ PointFinder::Make(Method method, const std::vector<CountyRecord>& countyRecords)
 			return std::unique_ptr<PointFinder>(new KDTreePointFinder(countyRecords));
 		case Method::QuadTree:
 			return std::unique_ptr<PointFinder>(new QuadTreePointFinder(countyRecords));
-		case Method::Linear:
-			throw std::runtime_error("Linear search method not yet implemented");
+		case Method::Heap:
+			return std::unique_ptr<PointFinder>(new HeapPointFinder(countyRecords));
 	}
 	throw std::runtime_error("Unknown search method specified");
 }

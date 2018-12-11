@@ -9,8 +9,6 @@
 // Availability of M_PI is unpredictiable. Just define pi here.
 #define KD_PI 3.14159265358979323846
 
-#include <iostream>
-
 struct KDNode final
 {
 	std::unique_ptr<KDNode> m_left;
