@@ -92,6 +92,7 @@ int main(int argc, char** argv)
 	auto pointFinder = PointFinder::Make(method, records);
 	auto buildEnd = std::chrono::steady_clock::now();
 	auto buildElapsed = std::chrono::duration<float>(buildEnd - buildStart);
+	std::cout << "Time to build the index: " << buildElapsed.count() << " s" << std::endl;
 	for (const auto& query : queries)
 	{
 		auto delimeterIndex = query.find(":");
@@ -126,8 +127,7 @@ int main(int argc, char** argv)
 				<< point.m_latitude << ", " << (point.m_longitude > 180 ? point.m_longitude - 360.0f : point.m_longitude) << ")\n";
 		}
 
-		std::cout << "Time to build the index: " << buildElapsed.count()
-			<< " s\nTime to calculate nearest neighbors: " << knnElapsed.count() << " s" << std::endl;
+		std::cout << "Time to calculate nearest neighbors: " << knnElapsed.count() << " s" << std::endl;
 		std::cout << std::flush;
 	}
 

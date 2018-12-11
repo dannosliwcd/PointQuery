@@ -1,7 +1,6 @@
 #include "KDTreePointFinder.h"
 #include "CountyRecord.h"
 #include "MaxHeap.h"
-#include <algorithm>
 #include <memory>
 #include <tuple>
 #define _USE_MATH_DEFINES
@@ -18,6 +17,59 @@ struct KDNode final
 	CountyRecord m_record;
 };
 
+template<typename Comparison>
+static size_t Partition(std::vector<CountyRecord>& records, size_t left, size_t right, size_t pivot, Comparison compare)
+{
+	auto pivotRecord = records[pivot];
+	std::swap(records[pivot], records[right]);
+	auto partitionIndex = left;
+	for (auto i = left; i < right; ++i)
+	{
+		if (compare(records[i], pivotRecord))
+		{
+			std::swap(records[partitionIndex], records[i]);
+			++partitionIndex;
+		}
+	}
+
+	std::swap(records[right], records[partitionIndex]);
+	return partitionIndex;
+}
+
+// Get the kth record, partially sorting the collection of records as we go.
+template<typename Comparison>
+static void QuickSelect(std::vector<CountyRecord>& records, size_t left, size_t right, size_t k, Comparison compare)
+{
+	while(true)
+	{
+		if (left == right)
+		{
+			return;
+		}
+		auto pivot = left + (rand() % (right - left + 1));
+		pivot = Partition(records, left, right, pivot, compare);
+		if (k == pivot)
+		{
+			return;
+		}
+		else if (k < pivot)
+		{
+			right = pivot - 1;
+		}
+		else
+		{
+			left = pivot + 1;
+		}
+	}
+}
+
+template<typename Comparison>
+static void sortToMedian(std::vector<CountyRecord>& records, Comparison compare)
+{
+	//std::sort(records.begin(), records.end(), compare);
+	QuickSelect(records, 0, records.size() - 1, records.size() / 2, compare);
+}
+
 // Insert the records to the KD tree in a manner that should lead to a
 // more balanced tree.
 // TODO: Consider applying the projection at this step. Center the projection around the center of our records.
@@ -30,7 +82,7 @@ std::unique_ptr<KDNode> KDTreePointFinder::BuildTree(
 		return nullptr;
 	}
 
-	std::sort(records.begin(), records.end(), [useLongitude](const CountyRecord& lhs, const CountyRecord& rhs)
+	sortToMedian(records, [useLongitude](const CountyRecord& lhs, const CountyRecord& rhs)
 			{
 				return useLongitude
 					? lhs.m_longitude < rhs.m_longitude
