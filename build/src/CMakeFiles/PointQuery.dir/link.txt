@@ -1,2 +1,0 @@
-/usr/bin/ar.exe qc libPointQuery.a  CMakeFiles/PointQuery.dir/CountyRecord.cpp.o
-/usr/bin/ranlib.exe libPointQuery.a

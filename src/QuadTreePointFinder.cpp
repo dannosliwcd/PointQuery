@@ -1,83 +1,19 @@
 #include "CountyRecord.h"
 #include <QuadTreePointFinder.h>
-
-QuadTreePointFinder::QuadTreePointFinder(
-		const std::vector<CountyRecord>& countyRecords)
-{
-	// TODO: countyRecords contains the raw list of county records.
-	//       Insert those records into your internal data structure for
-	//       the quad tree. You'll probably want to create a new member
-	//       variable for QuadTreePointFinder in the header file and add
-	//       the values there.
-	//
-	//       Don't worry about timing everything the CLI can handle that.
-	//       We can write the timer code once in the CLI and it will be applied
-	//       to all algorithms we use, instead of rewriting it for each algorithm.
-}
-
-QuadTreePointFinder::~QuadTreePointFinder()
-{
-}
-
-std::vector<CountyRecord> QuadTreePointFinder::FindNearest(
-		decltype(CountyRecord::m_latitude) lat,
-		decltype(CountyRecord::m_latitude) longitude,
-		unsigned int nearestCount)
-{
-	// TODO: Return the actual nearest points instead of an empty vector.
-	//       Base your search on the member variable you created for the other TODO
-	return {};
-}
-// C++ Implementation of Quad Tree 
+#include "Maxheap.h"
 #include <iostream> 
 #include <cmath> 
 #include <string.h>
 #include<vector>
-#include "Maxheap.h"
 using namespace std;
+using Node = QuadTreePointFinder::Node;
+using Point = QuadTreePointFinder::Point;
 
 //shoudl these be static?
 static int NE = 1;
 static int NW = 2;
 static int SE = 3;
 static int SW = 4;
-
-// Point dat struct
-struct Point 
-{ 
-	float x; 
-	float y; 
-	//constructors
-	Point(float _x, float _y) 
-	{ 
-		x = _x; //longitude
-		y = _y;  // latitude
-	} 
-	Point() 
-	{ 
-		x = 0; 
-		y = 0; 
-	} 
-}; 
-
-// The objects that we want stored in the quadtree 
-struct Node 
-{ 
-	Point pos; 
-	string state;
-	string county;
-	bool visited;
-	int quadrant;
-	Node(Point _pos, string _state, string _county) 
-	{ 
-		pos = _pos; 
-		state = _state;
-		county = _county;
-		visited = false;
-		quadrant = 0;
-		visited = false;
-	} 
-}; 
 
 // The main quadtree class 
 class Quad 
@@ -121,7 +57,7 @@ public:
 	void insert(Node*); 
 	Node* search(Point); 
 	bool inBoundary(Point); 
-	vector<Node> knn(int, Quad, float , float , Maxheap);
+	vector<Node> knn(int k, Quad& quad, float longi, float lati, MaxHeap<float, Point>& heap);
 }; 
 
 // Insert a node into the quadtree 
@@ -207,8 +143,10 @@ Node* Quad::search(Point p)
 	// We are at a quad of unit length 
 	// We cannot subdivide this quad further 
 	if (n != NULL) 
-		n.visited = true;
+	{
+		n->visited = true;
 		return n; 
+	}
 
 	if ((topLeft.x + botRight.x) / 2 >= p.x) 
 	{ 
@@ -265,10 +203,10 @@ float findDistance(float long1,float lat1,float long2,float lat2){
 	return (sqrt(x*x + y*y)*6371);
 }
 
- vector<Node> Quad::knn(int k, Quad quad, float longi, float lati, Maxheap heap){
+ vector<Node> Quad::knn(int k, Quad& quad, float longi, float lati, MaxHeap<float, Point>& heap){
 
  	for(int i = 0; i < k; i++){
- 		heap.insert(quad.search(Point(longi, lati)));	
+ 		// heap.insert(quad.search(Point(longi, lati)));	
  	}
  	//Node node = quad.search(Point(longi, lati));
  	//if NW, check ne, sw, se
@@ -276,21 +214,35 @@ float findDistance(float long1,float lat1,float long2,float lat2){
  	//if SW, check se, nw, ne
  	//if SE, check sw, ne, nw
  	//now, check all quadrants
- }
- }
-// Driver program 
-int main() 
-{ 
-	//Maxheap heap(3);
-	Quad center(Point(0, 0), Point(8, 8)); 
-	Node a(Point(1, 1),"aa","a"); 
-	Node b(Point(2, 5),"bb","b"); 
-	Node c(Point(7, 6), "cc","c"); 
-	center.insert(&a); 
-	center.insert(&b); 
-	center.insert(&c); 
+	return {};
+}
 
-	center.knn(2, center, 93.33332, -33.22124, heap); 
+QuadTreePointFinder::QuadTreePointFinder(
+		const std::vector<CountyRecord>& countyRecords)
+	: m_quad(new Quad()), m_nodes()
+{
+	m_nodes.reserve(countyRecords.size());
+	for (const auto& record : countyRecords)
+	{
+		// TODO: insert nodes in the tree for each record.
+		m_nodes.emplace_back(Point(record.m_longitude, record.m_latitude), record.m_state, record.m_county);
+		m_quad->insert(&m_nodes.back());
+	}
+
+
+}
+
+QuadTreePointFinder::~QuadTreePointFinder()
+{
+}
+
+std::vector<CountyRecord> QuadTreePointFinder::FindNearest(
+		decltype(CountyRecord::m_latitude) latitude,
+		decltype(CountyRecord::m_latitude) longitude,
+		unsigned int nearestCount)
+{
+	MaxHeap<float, Point> heap(nearestCount);
+	m_quad->knn(nearestCount, *m_quad, longitude, latitude, heap);
 
 	//PRINT HEAP
 
@@ -303,6 +255,6 @@ int main()
 	cout << "Non-existing node: "
 		<< center.search(Point(5, 5)); */
 
-
-	return 0; 
-} 
+	// TODO: Return the actual nearest points instead of an empty vector.
+	return {};
+}

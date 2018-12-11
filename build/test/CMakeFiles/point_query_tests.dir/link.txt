@@ -1,1 +1,0 @@
-/usr/bin/c++.exe    -Wl,--enable-auto-import CMakeFiles/point_query_tests.dir/TestRunner.cpp.o CMakeFiles/point_query_tests.dir/CountyRecord.cpp.o  -o point_query_tests.exe -Wl,--out-implib,libpoint_query_tests.dll.a -Wl,--major-image-version,0,--minor-image-version,0 ../src/libPointQuery.a 

@@ -1,5 +1,0 @@
-if(EXISTS "/cygdrive/c/Users/Brian/Desktop/EC504/PointQuery/build/test/point_query_tests_tests-b858cb2.cmake")
-  include("/cygdrive/c/Users/Brian/Desktop/EC504/PointQuery/build/test/point_query_tests_tests-b858cb2.cmake")
-else()
-  add_test(point_query_tests_NOT_BUILT-b858cb2 point_query_tests_NOT_BUILT-b858cb2)
-endif()
