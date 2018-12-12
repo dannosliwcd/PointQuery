@@ -63,14 +63,12 @@ static void QuickSelect(std::vector<CountyRecord>& records, size_t left, size_t 
 	}
 }
 
-#include <algorithm>
 template<typename Comparison>
 static void sortToMedian(std::vector<CountyRecord>& records, Comparison compare)
 {
 	//std::sort(records.begin(), records.end(), compare);
 	QuickSelect(records, 0, records.size() - 1, records.size() / 2, compare);
 }
-#include <iostream>
 
 // Insert the records to the KD tree in a manner that should lead to a
 // more balanced tree.
@@ -94,31 +92,10 @@ std::unique_ptr<KDNode> KDTreePointFinder::BuildTree(
 	auto medianRecord = records[midpoint];
 
 	// Split into (left, <remove the split point>, right)
-	auto lv = std::vector<CountyRecord>(records.begin(), records.begin() + midpoint);
-	auto left = BuildTree(lv, !useLongitude);
-	auto rv = std::vector<CountyRecord>(records.begin() + midpoint + 1, records.end());
-	auto right = BuildTree(rv, !useLongitude);
-	//std::vector<CountyRecord>().swap(records);
-	//
-	if (useLongitude)
-	{
-		if (left && right && left->m_record.m_longitude > right->m_record.m_longitude)
-		{
-			throw std::runtime_error("Out of order!");
-		}
-	}
-	else
-	{
-		if (left && right && left->m_record.m_latitude > right->m_record.m_latitude)
-		{
-			throw std::runtime_error("Out of order!");
-		}
-	}
+	auto left = BuildTree(std::vector<CountyRecord>(records.begin(), records.begin() + midpoint), !useLongitude);
+	auto right = BuildTree(std::vector<CountyRecord>(records.begin() + midpoint + 1, records.end()), !useLongitude);
+	std::vector<CountyRecord>().swap(records);
 	
-	if (medianRecord.m_county == "Wake" && medianRecord.m_state == "NC")
-	{
-		//std::cout << "insert from pt " << midpoint << " and size " << records.size()<< ": lv:" << (lv.empty() ? CountyRecord() : lv.front()) << ", rv: " <<(rv.empty() ? CountyRecord() : rv.front()) <<" : " << medianRecord << std::endl;
-	}
 	// Keep data points in all nodes
 	return std::unique_ptr<KDNode>(new KDNode{
 			std::move(left),
@@ -127,7 +104,6 @@ std::unique_ptr<KDNode> KDTreePointFinder::BuildTree(
 			medianRecord});
 }
 
-#include <iostream>
 KDTreePointFinder::KDTreePointFinder(
 		const std::vector<CountyRecord>& countyRecords)
 	: m_root(BuildTree(countyRecords, true))
@@ -153,20 +129,6 @@ static float Distance(float latitude1, float longitude1, float latitude2, float 
 	auto y = phi2 - phi1;
 	// TODO: Can remove the radius and sqrt since this is only for relative comparisons.
 	return std::sqrt(x * x + y * y) * EARTH_RADIUS_METERS;
-}
-
-static float CrossTrackDistance(float lat1, float long1, float lat2, float long2, float lat3, float long3)
-{
-	static const auto EARTH_RADIUS_METERS = 6371e3;
-	auto getBearing = [](float lat1, float long1, float lat2, float long2) -> float
-	{
-		auto distLong = long2 - long1;
-		auto y = std::sin(distLong) * std::cos(lat2);
-		auto x = std::cos(lat1) * std::sin(lat2) - std::sin(lat1) * std::cos(lat2) * std::cos(distLong);
-		return std::atan2(y, x);
-	};
-
-	return std::abs(std::asin(std::sin(Distance(lat3, long3, lat2, long2)) * std::sin(getBearing(lat3 * KD_PI/180, long3 * KD_PI/180, lat1 * KD_PI/180, long1 * KD_PI/180) - getBearing(lat3 * KD_PI/180, long3 * KD_PI/180, lat2 * KD_PI/180, long2 * KD_PI/180))) * EARTH_RADIUS_METERS);
 }
 
 // Find k nearest neighbors
@@ -222,17 +184,15 @@ static float CrossTrackDistance(float lat1, float long1, float lat2, float long2
 				if (node->m_isLongitude)
 				{
 					auto distance = Distance(parentSplit, longitude, latitude, longitude);
-					//if (node->m_record.m_state == "NC" && node->m_record.m_county == "Wake") std::cout << "wake long dist: " << distance << std::endl;
-					if (distance-400000 > nearestCounties.GetMax().p && latitude < parentSplit)
+					if (distance > nearestCounties.GetMax().p && latitude < parentSplit)
 					{
 						continue;
 					}
 				}
 				else
 				{
-					auto distance = CrossTrackDistance(0, parentSplit, 90, parentSplit, latitude, longitude);
-					//if (node->m_record.m_state == "NC" && node->m_record.m_county == "Wake") std::cout << "wake xt lat dist: " << distance << std::endl;
-					if (distance-400000 > nearestCounties.GetMax().p && longitude < parentSplit)
+					auto distance = Distance(latitude, longitude, latitude, parentSplit);
+					if (distance > nearestCounties.GetMax().p && longitude < parentSplit)
 					{
 						continue;
 					}
@@ -243,18 +203,15 @@ static float CrossTrackDistance(float lat1, float long1, float lat2, float long2
 				if (node->m_isLongitude)
 				{
 					auto distance = Distance(parentSplit, longitude, latitude, longitude);
-					//auto distance = CrossTrackDistance(0, parentSplit, 90, parentSplit, latitude, longitude);
-					//if (node->m_record.m_state == "NC" && node->m_record.m_county == "Wake") std::cout << "wake long dist: " << distance << std::endl;
-					if (distance-400000 > nearestCounties.GetMax().p && latitude > parentSplit)
+					if (distance > nearestCounties.GetMax().p && latitude > parentSplit)
 					{
 						continue;
 					}
 				}
 				else
 				{
-					auto distance = CrossTrackDistance(0, parentSplit, 90, parentSplit, latitude, longitude);
-					//if (node->m_record.m_state == "NC" && node->m_record.m_county == "Wake") std::cout << "wake xt lat dist: " << distance << std::endl;
-					if (distance-400000 > nearestCounties.GetMax().p && longitude > parentSplit)
+					auto distance = Distance(latitude, longitude, latitude, parentSplit);
+					if (distance > nearestCounties.GetMax().p && longitude > parentSplit)
 					{
 						continue;
 					}
