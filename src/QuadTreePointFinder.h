@@ -9,7 +9,7 @@ class QuadTreePointFinder final : public PointFinder
 public:
 	QuadTreePointFinder(const std::vector<CountyRecord>& countyRecords);
 	virtual ~QuadTreePointFinder();
-	virtual std::vector<CountyRecord> FindNearest(
+	virtual std::vector<std::pair<float, CountyRecord> > FindNearest(
 			decltype(CountyRecord::m_latitude) lat,
 			decltype(CountyRecord::m_latitude) longitude,
 			unsigned int nearestCount) override;

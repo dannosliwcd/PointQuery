@@ -1,6 +1,7 @@
 #ifndef POINTFINDER_H
 #define POINTFINDER_H
 #include "CountyRecord.h"
+#include <utility>
 #include <memory>
 #include <vector>
 
@@ -16,7 +17,7 @@ public:
 
 	PointFinder();
 	virtual ~PointFinder();
-	virtual std::vector<CountyRecord> FindNearest(
+	virtual std::vector<std::pair<float, CountyRecord> > FindNearest(
 			decltype(CountyRecord::m_latitude) lat,
 			decltype(CountyRecord::m_latitude) longitude,
 			unsigned int nearestCount) = 0;

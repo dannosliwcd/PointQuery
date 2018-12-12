@@ -19,7 +19,7 @@ QuadTreePointFinder::~QuadTreePointFinder()
 {
 }
 
-std::vector<CountyRecord> QuadTreePointFinder::FindNearest(
+std::vector<std::pair<float, CountyRecord> > QuadTreePointFinder::FindNearest(
 		decltype(CountyRecord::m_latitude) lat,
 		decltype(CountyRecord::m_latitude) longitude,
 		unsigned int nearestCount)

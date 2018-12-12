@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 {
 	auto start = std::chrono::steady_clock::now();
 	static const std::string METHOD_HEAP("heap");
-	static const std::string METHOD_QUADTREE("quadtree");
+	//static const std::string METHOD_QUADTREE("quadtree");
 	static const std::string METHOD_KD_TREE("kdtree");
 
 	CLI::App app("County Search");
@@ -34,10 +34,10 @@ int main(int argc, char** argv)
 	app.add_option("county_file", filePath, "Path to file")->required();
 	app.add_option("-f,--find", queries, "Queries in latitude:longitude format. E.g. 36.4:-94.4");
 	std::ostringstream methodHelp;
-	methodHelp << "Search method. May be one of: " << METHOD_HEAP << " (default), " << METHOD_QUADTREE << ", " << METHOD_KD_TREE;
+	methodHelp << "Search method. May be one of: " << METHOD_HEAP << " (default), or " << METHOD_KD_TREE;
 	app.add_option("-m,--method", methodStr, methodHelp.str());
 	app.add_option("-k,--point-count", pointCount, "Number of neighboring points to find per query. Default: 1");
-	app.add_option("-s,--show-surrounding-county", showCounty, "If enabled, also search for the 5 nearest "
+	app.add_flag("-s,--show-surrounding-county", showCounty, "If enabled, also search for the 5 nearest "
 			"counties. Print the most common county, state pair in the surrounding area.");
 	CLI11_PARSE(app, argc, argv);
 
@@ -82,10 +82,6 @@ int main(int argc, char** argv)
 	{
 		method = PointFinder::Method::Heap;
 	}
-	else if (methodStr == METHOD_QUADTREE)
-	{
-		method = PointFinder::Method::QuadTree;
-	}
 	else if (methodStr == METHOD_KD_TREE)
 	{
 		method = PointFinder::Method::KDTree;
@@ -129,10 +125,11 @@ int main(int argc, char** argv)
 
 		std::cout << "Nearest " << pointCount << " points to ("
 			<< latitude << ", " << longitude << "):\n";
-		for (const auto& point : nearestPoints)
+		for (auto it = nearestPoints.rbegin(); it != nearestPoints.rend(); ++it)
 		{
+			auto& point = it->second;
 			std::cout << point.m_county << ", " << point.m_state << " (" 
-				<< point.m_latitude << ", " << (point.m_longitude > 180 ? point.m_longitude - 360.0f : point.m_longitude) << ")\n";
+				<< point.m_latitude << ", " << (point.m_longitude > 180 ? point.m_longitude - 360.0f : point.m_longitude) << "): " << it->first << " km\n";
 		}
 
 		std::cout << "Time to calculate nearest neighbors: " << knnElapsed.count() << " s\n" << std::endl;
@@ -153,8 +150,8 @@ int main(int argc, char** argv)
 				const auto& countyPoint = countyPoints.back();
 				for (auto& countyCount : countyCounts)
 				{
-					if (countyCount.first.m_county == countyPoint.m_county
-							&& countyCount.first.m_state == countyPoint.m_state)
+					if (countyCount.first.m_county == countyPoint.second.m_county
+							&& countyCount.first.m_state == countyPoint.second.m_state)
 					{
 						countyCount.second += 1;
 						found = true;
@@ -162,7 +159,7 @@ int main(int argc, char** argv)
 				}
 				if (!found)
 				{
-					countyCounts.emplace_back(countyPoint, 1);
+					countyCounts.emplace_back(countyPoint.second, 1);
 				}
 				countyPoints.pop_back();
 			}

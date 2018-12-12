@@ -33,7 +33,7 @@ HeapPointFinder::~HeapPointFinder()
 {
 }
 
-std::vector<CountyRecord> HeapPointFinder::FindNearest(
+std::vector<std::pair<float, CountyRecord> > HeapPointFinder::FindNearest(
 		decltype(CountyRecord::m_latitude) latitude,
 		decltype(CountyRecord::m_latitude) longitude,
 		unsigned int nearestCount)
@@ -56,11 +56,11 @@ std::vector<CountyRecord> HeapPointFinder::FindNearest(
 		}
 	}
 
-	std::vector<CountyRecord> records;
+	std::vector<std::pair<float, CountyRecord> > records;
 	records.reserve(nearestCounties.GetSize());
 	while (!nearestCounties.IsEmpty())
 	{
-		records.emplace_back(*nearestCounties.GetMax().e);
+		records.emplace_back(nearestCounties.GetMax().p, *nearestCounties.GetMax().e);
 		nearestCounties.RemoveMax();
 	}
 	return records;

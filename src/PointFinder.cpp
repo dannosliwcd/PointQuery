@@ -20,7 +20,7 @@ PointFinder::Make(Method method, const std::vector<CountyRecord>& countyRecords)
 		case Method::KDTree:
 			return std::unique_ptr<PointFinder>(new KDTreePointFinder(countyRecords));
 		case Method::QuadTree:
-			return std::unique_ptr<PointFinder>(new QuadTreePointFinder(countyRecords));
+			throw std::runtime_error("QuadTree not implemented");
 		case Method::Heap:
 			return std::unique_ptr<PointFinder>(new HeapPointFinder(countyRecords));
 	}

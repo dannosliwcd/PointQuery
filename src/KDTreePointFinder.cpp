@@ -134,7 +134,7 @@ static float Distance(float latitude1, float longitude1, float latitude2, float 
 // Find k nearest neighbors
 // Nice visual guide at:
 // https://gopalcdas.com/2017/05/24/construction-of-k-d-tree-and-using-it-for-nearest-neighbour-search/
-std::vector<CountyRecord> KDTreePointFinder::FindNearest(
+	std::vector<std::pair<float, CountyRecord> > KDTreePointFinder::FindNearest(
 		decltype(CountyRecord::m_latitude) latitude,
 		decltype(CountyRecord::m_latitude) longitude,
 		unsigned int nearestCount)
@@ -250,11 +250,11 @@ std::vector<CountyRecord> KDTreePointFinder::FindNearest(
 		}
 	}
 
-	std::vector<CountyRecord> records;
+	std::vector<std::pair<float, CountyRecord> > records;
 	records.reserve(nearestCounties.GetSize());
 	while (!nearestCounties.IsEmpty())
 	{
-		records.emplace_back(*nearestCounties.GetMax().e);
+		records.emplace_back(nearestCounties.GetMax().p, *nearestCounties.GetMax().e);
 		nearestCounties.RemoveMax();
 	}
 	return records;
