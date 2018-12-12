@@ -177,13 +177,13 @@ static float Distance(float latitude1, float longitude1, float latitude2, float 
 		// with an equirectangular projection. Distance measurements
 		// are impacted by your choice of central point for the
 		// projection.
-		if (!nearestCounties.IsEmpty() && nearestCounties.IsFull())
+		if (nearestCounties.IsFull())
 		{
 			if (doLeftCheck)
 			{
 				if (node->m_isLongitude)
 				{
-					auto distance = Distance(latitude, parentSplit, longitude, longitude);
+					auto distance = Distance(parentSplit, longitude, latitude, longitude);
 					if (distance > nearestCounties.GetMax().p && latitude < parentSplit)
 					{
 						continue;
@@ -191,7 +191,7 @@ static float Distance(float latitude1, float longitude1, float latitude2, float 
 				}
 				else
 				{
-					auto distance = Distance(latitude, latitude, longitude, parentSplit);
+					auto distance = Distance(latitude, longitude, latitude, parentSplit);
 					if (distance > nearestCounties.GetMax().p && longitude < parentSplit)
 					{
 						continue;
@@ -202,7 +202,7 @@ static float Distance(float latitude1, float longitude1, float latitude2, float 
 			{
 				if (node->m_isLongitude)
 				{
-					auto distance = Distance(latitude, parentSplit, longitude, longitude);
+					auto distance = Distance(parentSplit, longitude, latitude, longitude);
 					if (distance > nearestCounties.GetMax().p && latitude > parentSplit)
 					{
 						continue;
@@ -210,7 +210,7 @@ static float Distance(float latitude1, float longitude1, float latitude2, float 
 				}
 				else
 				{
-					auto distance = Distance(latitude, latitude, longitude, parentSplit);
+					auto distance = Distance(latitude, longitude, latitude, parentSplit);
 					if (distance > nearestCounties.GetMax().p && longitude > parentSplit)
 					{
 						continue;
@@ -220,12 +220,16 @@ static float Distance(float latitude1, float longitude1, float latitude2, float 
 		}
 
 		auto distance = Distance(latitude, longitude, node->m_record.m_latitude, node->m_record.m_longitude);
-		if (nearestCounties.IsEmpty() || distance < nearestCounties.GetMax().p)
+		if (nearestCounties.IsFull())
 		{
-			if (nearestCounties.IsFull())
-		       	{
+			if (distance < nearestCounties.GetMax().p)
+			{
 				nearestCounties.RemoveMax();
+				nearestCounties.Insert(distance, &node->m_record);
 			}
+		}
+		else
+		{
 			nearestCounties.Insert(distance, &node->m_record);
 		}
 
